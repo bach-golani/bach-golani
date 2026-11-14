@@ -311,6 +311,13 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
 .hol-it .htx{flex:1;min-width:0}.hol-it .htx b{display:block}.hol-it .htx small{color:var(--ink-2);font-size:12.5px}
 .hol-it .hcd{font-size:12.5px;font-weight:700;color:var(--green);white-space:nowrap}
 .hol-it.now .hcd{background:var(--green);color:#fff;padding:3px 8px;border-radius:9px}
+.mon-h{display:flex;justify-content:space-between;align-items:baseline;margin:16px 4px 8px;padding-bottom:6px;border-bottom:2px solid var(--green)}
+.mon-h b{font-size:17px}.mon-h span{font-size:13px;color:var(--ink-2)}
+.mx tr.mon-row th,.mx tr.mon-row td{border-top:2px solid var(--green)}
+.mon-sum{display:flex;gap:8px;margin-top:10px}
+.mon-sum span{flex:1;text-align:center;padding:8px 4px;border-radius:12px;background:rgba(0,0,0,.05);font-size:12.5px;color:var(--ink-2)}
+.mon-sum span b{display:block;font-size:20px;color:var(--ink)}
+.mon-sum span.cur{background:var(--green);color:#fff}.mon-sum span.cur b{color:#fff}
 .split .hph-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
 .split .hph-dots i{width:6px;height:6px;border-radius:9px;background:rgba(251,247,236,.5);transition:width .3s}
 .split .hph-dots i.on{width:18px;background:var(--paper)}
@@ -886,9 +893,14 @@ function renderList(){
       return `<button class="gal-t" data-open="${esc(i.id)}"><div class="gal-im" ${im?`data-thumb="${esc(im.id)}"`:""}>${n>1?`<span class="gal-n">${n}</span>`:""}</div><span class="gal-c">${esc(i.title)}${i.date?`<small>${fmtDate(i.date)}</small>`:""}</span></button>`; }).join("")}</div>`;
     loadThumbs();
   } else
-  $("#l-list").innerHTML=list.length?list.map(i=>row(i)).join(""):
+  $("#l-list").innerHTML=list.length?(current==="reports"&&listSub!=="format"?byMonthHtml(list):list.map(i=>row(i)).join("")):
     `<div class="empty"><b>עדיין אין כאן תוכן</b>${canWrite?esc(hint)+'<br><button class="add" data-new>הוספת פריט</button>':"התוכן יעלה בקרוב"}</div>`;
 }
+const HE_MON=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+const monKey=i=>(i.date||"").slice(0,7)||(i.updatedAt?new Date(i.updatedAt).toISOString().slice(0,7):"");
+const monName=k=>k?`${HE_MON[+k.slice(5,7)-1]} ${k.slice(0,4)}`:"ללא תאריך";
+function byMonthHtml(list){ const g=new Map(); list.forEach(i=>{ const k=monKey(i); if(!g.has(k)) g.set(k,[]); g.get(k).push(i); });
+  return [...g.keys()].sort().reverse().map(k=>`<div class="mon-h"><b>${esc(monName(k))}</b><span>${g.get(k).length===1?"דיווח אחד":g.get(k).length+" דיווחים"}</span></div>`+g.get(k).map(i=>row(i)).join("")).join(""); }
 $("#l-tabs").addEventListener("click",e=>{ const t=e.target.closest("[data-sub]"); if(t){ listSub=t.dataset.sub; renderList(); }});
 $("#l-tabs2").addEventListener("click",e=>{ const t=e.target.closest("[data-unit]"); if(t){ listUnit=t.dataset.unit; renderList(); }});
 $("#l-add").onclick=()=>editItem(null);
@@ -1306,7 +1318,9 @@ function renderCmd(){
   const R=SECTIONS.reports;
   h+=`<div class="card"><h2>דיווחים ראשונים<button data-go="reports">לכל הדיווחים ›</button></h2><table class="mx"><thead><tr><th></th>${R.units.map(([,n])=>`<th>${esc(n)}</th>`).join("")}</tr></thead><tbody>${
     R.subs.filter(([k])=>k!=="format").map(([k,n])=>`<tr><th scope="row">${esc(n)}</th>${R.units.map(([u])=>{ const L=items.filter(i=>i.section==="reports"&&i.sub===k&&i.unit===u); const last=L.map(i=>i.date||"").sort().at(-1); return `<td class="${L.length?"ok":""}">${L.length||"–"}${last?`<small>${ddmm(last.slice(0,10))}</small>`:""}</td>`; }).join("")}</tr>`).join("")
-  }</tbody></table></div>`;
+  }${(()=>{ const ck=new Date().toISOString().slice(0,7); return `<tr class="mon-row"><th scope="row">${esc(HE_MON[+ck.slice(5,7)-1])}</th>${R.units.map(([u])=>{ const n=items.filter(i=>i.section==="reports"&&i.sub!=="format"&&i.unit===u&&monKey(i)===ck).length; return `<td class="${n?"ok":""}">${n||"–"}</td>`; }).join("")}</tr>`; })()}</tbody></table>${(()=>{
+    const rs=items.filter(i=>i.section==="reports"&&i.sub!=="format"), now=new Date(), ks=[0,1,2].map(d=>{ const x=new Date(now.getFullYear(),now.getMonth()-d,1); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0"); });
+    return `<div class="mon-sum">${ks.map((k,j)=>`<span class="${j?"":"cur"}"><b>${rs.filter(i=>monKey(i)===k).length}</b>${esc(HE_MON[+k.slice(5,7)-1])}</span>`).join("")}</div>`; })()}</div>`;
   // literature bars
   const P=SECTIONS.procedures, rowsB=[...P.subs.map(([k,n])=>[n,by("procedures",k).length,"procedures"]),["לקחים ולמידה",by("learning").length,"learning"],["חינוך ומורשת",by("education").length,"education"],["תכנים משלימים",by("content").length,"content"]];
   const mx=Math.max(1,...rowsB.map(r=>r[1]));
