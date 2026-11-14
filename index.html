@@ -306,6 +306,11 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
 .fb-it{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
 .fb-it .h{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
 .fb-it p{margin:6px 0;white-space:pre-wrap}
+.hol-it{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.hol-it .hic{font-size:20px;width:28px;text-align:center}
+.hol-it .htx{flex:1;min-width:0}.hol-it .htx b{display:block}.hol-it .htx small{color:var(--ink-2);font-size:12.5px}
+.hol-it .hcd{font-size:12.5px;font-weight:700;color:var(--green);white-space:nowrap}
+.hol-it.now .hcd{background:var(--green);color:#fff;padding:3px 8px;border-radius:9px}
 .split .hph-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
 .split .hph-dots i{width:6px;height:6px;border-radius:9px;background:rgba(251,247,236,.5);transition:width .3s}
 .split .hph-dots i.on{width:18px;background:var(--paper)}
@@ -712,10 +717,59 @@ const SLIDES=[["p-march.jpg","center 62%"],["p-sky.jpg","center 48%"],["p-urban.
 const ICON_CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
 const ICON_DOC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>';
 function count(k){ const n=items.filter(i=>i.section===k).length; return n?n+" פריטים":""; }
+const HM={Tishri:1,Heshvan:2,Kislev:3,Tevet:4,Shevat:5,"Adar I":6,Adar:6.5,"Adar II":6.5,Nisan:7,Iyar:8,Sivan:9,Tamuz:10,Av:11,Elul:12};
+const hFmt=new Intl.DateTimeFormat("en-u-ca-hebrew",{day:"numeric",month:"long",timeZone:"UTC"});
+function hdate(d){ const p=hFmt.formatToParts(d); return {m:HM[p.find(x=>x.type==="month").value],d:+p.find(x=>x.type==="day").value}; }
+function holidays(from,days){
+  const out=[], start=Date.UTC(from.getFullYear(),from.getMonth(),from.getDate());
+  const DAY=864e5, at=t=>new Date(t), dow=t=>at(t).getUTCDay();
+  const add=(name,t,len,kind,note)=>out.push({name,from:t,to:t+(len-1)*DAY,len,kind,note:note||""});
+  for(let t=start-10*DAY;t<start+days*DAY;t+=DAY){
+    const {m,d}=hdate(at(t));
+    if(m===1&&d===1) add("ראש השנה",t,2,"חג");
+    if(m===1&&d===10) add("יום כיפור",t,1,"חג");
+    if(m===1&&d===15) add("סוכות",t,7,"חג","חג ראשון וחול המועד");
+    if(m===1&&d===22) add("שמיני עצרת ושמחת תורה",t,1,"חג");
+    if(m===1&&d===24) add("יום הזיכרון לאירועי 7 באוקטובר",t,1,"זיכרון");
+    if(m===3&&d===25) add("חנוכה",t,8,"מועד");
+    if(m===4&&d===10) add("צום עשרה בטבת",t,1,"צום");
+    if(m===5&&d===15) add("ט״ו בשבט",t,1,"מועד");
+    if(m===6.5&&d===14) add("פורים",t,1,"מועד","שושן פורים (ירושלים) למחרת");
+    if(m===7&&d===15) add("פסח",t,7,"חג","חג ראשון, חול המועד ושביעי של פסח");
+    if(m===7&&d===27){ let x=t; if(dow(x)===5) x-=DAY; else if(dow(x)===0) x+=DAY; add("יום הזיכרון לשואה ולגבורה",x,1,"זיכרון"); }
+    if(m===8&&d===4){ let z=t; const w=dow(z); if(w===4) z-=DAY; else if(w===5) z-=2*DAY; else if(w===0) z+=DAY;
+      add("יום הזיכרון לחללי מערכות ישראל",z,1,"זיכרון"); add("יום העצמאות",z+DAY,1,"חג"); }
+    if(m===8&&d===18) add("ל״ג בעומר",t,1,"מועד");
+    if(m===8&&d===28) add("יום ירושלים",t,1,"מועד");
+    if(m===9&&d===6) add("שבועות",t,1,"חג");
+    if(m===10&&d===17){ let x=t; if(dow(x)===6) x+=DAY; add("צום י״ז בתמוז",x,1,"צום"); }
+    if(m===11&&d===9){ let x=t; if(dow(x)===6) x+=DAY; add("תשעה באב",x,1,"צום"); }
+  }
+  return out.filter(h=>h.to>=start).sort((a,b)=>a.from-b.from);
+}
+
+const HOL_IC={"חג":"🕎","מועד":"🎉","צום":"🕯️","זיכרון":"🕯️"};
+const dayStart=()=>{ const n=new Date(); return Date.UTC(n.getFullYear(),n.getMonth(),n.getDate()); };
+function holLen(n){ return n===1?"יום אחד":n===2?"יומיים":n+" ימים"; }
+function holWhen(h){ const t=dayStart(), D=864e5, k=Math.round((h.from-t)/D);
+  if(t>=h.from&&t<=h.to) return h.len>1?`עכשיו · יום ${Math.round((t-h.from)/D)+1} מתוך ${h.len}`:"היום";
+  if(k===1) return h.kind==="חג"?"מחר (ערב חג הערב)":"מחר"; return `בעוד ${k} ימים`; }
+function holDates(h){ const f=new Date(h.from), o={day:"numeric",month:"numeric",timeZone:"UTC"}, w={weekday:"short",timeZone:"UTC"};
+  const a=f.toLocaleDateString("he-IL",w)+" "+f.toLocaleDateString("he-IL",o);
+  if(h.len===1) return a; const e=new Date(h.to); return a+" – "+e.toLocaleDateString("he-IL",w)+" "+e.toLocaleDateString("he-IL",o); }
+function holTile(){ let L=[]; try{ L=holidays(new Date(),400); }catch{ return ""; } const h=L[0]; if(!h) return "";
+  return `<button class="tl2 sand full row" id="hol-tile"><div><small>החג הקרוב · ${esc(holWhen(h))}</small><h3>${esc(h.name)}</h3><small>${esc(holDates(h))} · ${holLen(h.len)}</small></div>${ARROW}</button>`; }
+function openHolidays(){ const L=holidays(new Date(),370);
+  openSheet(`<h2>חגים ומועדים</h2><p style="color:var(--ink-2);margin:0 0 10px">השנה הקרובה. חגים מתחילים בערב שלפני.</p>
+    <div class="hol-l">${L.map(h=>`<div class="hol-it ${dayStart()>=h.from?"now":""}"><span class="hic" aria-hidden="true">${HOL_IC[h.kind]||"📅"}</span><div class="htx"><b>${esc(h.name)}</b><small>${esc(holDates(h))} · ${holLen(h.len)}${h.note?" · "+esc(h.note):""}</small></div><span class="hcd">${esc(holWhen(h))}</span></div>`).join("")}</div>
+    <div class="btns"><button class="ghost" id="hol-c">סגירה</button></div>`);
+  $("#hol-c").onclick=closeSheet; }
+document.addEventListener("click",e=>{ if(e.target.closest("#hol-tile")) openHolidays(); });
 function renderGrid(){
   const last=items.filter(i=>i.section==="summaries").sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.updatedAt||0)-(a.updatedAt||0))[0];
   $("#grid").innerHTML=`
     <button class="tl2 cmdt full row" data-go="cmd"><div><small>תמונת מצב כללית</small><h3>מפקד הבא״ח</h3></div>${ARROW}</button>
+    ${holTile()}
     <button class="tl2 olive" data-go="gantt">${ICON_CAL}<h3>גרף<br>וגאנט</h3></button>
     <button class="tl2 sand" data-go="procedures">${ICON_DOC}<div><h3>ספרות<br>מקצועית</h3><small>${count("procedures")}</small></div></button>
     <button class="tl2 photo full rep" data-go="reports"><h3>דיווחים ראשונים</h3></button>
