@@ -293,6 +293,19 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
 .split .hph{clip-path:none}
 .split .hph::after{background:linear-gradient(to bottom,rgba(12,24,16,.6) 0%,rgba(12,24,16,.15) 38%,rgba(12,24,16,.1) 55%,rgba(20,32,22,.8) 100%)}
 .split .motto,.split .brand b{color:#fff!important;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.fbox{margin:22px 0 8px;padding:18px;border-radius:24px;background:var(--paper,#fbf7ec);box-shadow:var(--shadow)}
+.fbox h2{margin:0 0 4px;font-size:20px}
+.fbox p{margin:0 0 12px;color:var(--ink-2);font-size:14px}
+.fbox input#fb-n,.fbox textarea{width:100%;box-sizing:border-box;border:1px solid rgba(0,0,0,.12);border-radius:14px;padding:11px 12px;font:inherit;background:#fff;margin-bottom:8px}
+.fb-kinds{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.fb-kinds label{flex:1}
+.fb-kinds input{position:absolute;opacity:0;pointer-events:none}
+.fb-kinds span{display:block;text-align:center;padding:9px 6px;border-radius:12px;background:rgba(0,0,0,.05);font-size:14px;cursor:pointer}
+.fb-kinds input:checked+span{background:var(--green);color:#fff}
+.fb-kinds input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px}
+.fb-it{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+.fb-it .h{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
+.fb-it p{margin:6px 0;white-space:pre-wrap}
 .split .hph-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
 .split .hph-dots i{width:6px;height:6px;border-radius:9px;background:rgba(251,247,236,.5);transition:width .3s}
 .split .hph-dots i.on{width:18px;background:var(--paper)}
@@ -505,6 +518,20 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
     <div id="home-main" style="display:flex;flex-direction:column;gap:12px">
       <button class="today-card" data-go="gantt"><div class="in" id="today-in"><div class="eb">היום</div><div class="ln">הגאנט נטען…</div></div></button>
       <div class="tgrid" id="grid"></div>
+      <div class="fbox" id="fbox">
+        <h2>תיבת פניות</h2><p>רעיונות, בעיות או דברים שכדאי להוסיף? כתבו כאן – זה מגיע ישירות למנהל האפליקציה.</p>
+        <form id="fb-f">
+          <div class="fb-kinds" role="radiogroup" aria-label="סוג הפנייה">
+            <label><input type="radio" name="fbk" value="רעיון" checked><span>💡 רעיון</span></label>
+            <label><input type="radio" name="fbk" value="בעיה"><span>⚠️ בעיה</span></label>
+            <label><input type="radio" name="fbk" value="להוסיף"><span>➕ להוסיף</span></label>
+          </div>
+          <input id="fb-n" placeholder="שם ותפקיד (לא חובה)" aria-label="שם ותפקיד" maxlength="80">
+          <textarea id="fb-t" rows="3" placeholder="מה תרצו לכתוב?" aria-label="תוכן הפנייה" maxlength="2000" required></textarea>
+          <div class="btns"><button class="add" type="submit" id="fb-b">שליחה</button><button class="ghost" type="button" id="fb-adm" hidden>פניות שהתקבלו</button></div>
+          <div class="err" id="fb-e" aria-live="polite"></div>
+        </form>
+      </div>
     </div>
   </div>
   <div class="status" id="status"></div>
@@ -1475,6 +1502,27 @@ function startData(){
   db.doc("settings/main").onSnapshot(s=>{ settings=s.exists?s.data():{}; tick(); if(current==="cmd") renderCmd(); },()=>{});
 }
 /* encrypt anything still stored in the clear (old items, new gantt weeks, old files) */
+async function fbSend(rec){ const {error}=await SB.from("feedback").insert({kind:rec.kind,name:rec.name,body:rec.text}); if(error) throw sbErr(error); }
+async function fbList(){ const {data,error}=await SB.from("feedback").select("*").order("created_at",{ascending:false}).limit(500); if(error) throw sbErr(error); return (data||[]).map(r=>({kind:r.kind,name:r.name,text:r.body,at:Date.parse(r.created_at),_id:r.id})); }
+async function fbDel(m){ const {error}=await SB.from("feedback").delete().eq("id",m._id); if(error) throw sbErr(error); }
+function fbInit(){
+  const f=$("#fb-f"); if(!f) return;
+  $("#fb-adm").hidden=!canEdit;
+  f.onsubmit=async e=>{ e.preventDefault(); const text=$("#fb-t").value.trim(); if(!text) return;
+    const rec={kind:(f.querySelector('input[name=fbk]:checked')||{}).value||"",name:$("#fb-n").value.trim(),text,at:Date.now()};
+    $("#fb-b").disabled=true; $("#fb-e").textContent="שולח…";
+    try{ await fbSend(rec); $("#fb-t").value=""; $("#fb-e").textContent="תודה! הפנייה נשלחה למנהל."; }
+    catch(err){ console.error(err); $("#fb-e").textContent="השליחה נכשלה. נסו שוב בעוד רגע."; }
+    $("#fb-b").disabled=false; };
+  $("#fb-adm").onclick=async()=>{
+    openSheet('<h2>פניות שהתקבלו</h2><div id="fb-l"><span class="spin"></span> טוען…</div><div class="btns"><button class="ghost" id="fb-c">סגירה</button></div><div class="err" id="fb-le"></div>');
+    $("#fb-c").onclick=closeSheet;
+    const draw=async()=>{ try{ const L=(await fbList()).sort((a,b)=>(b.at||0)-(a.at||0));
+        $("#fb-l").innerHTML=L.length?L.map((m,k)=>`<div class="fb-it"><div class="h"><b>${esc(m.kind||"פנייה")}${m.name?" · "+esc(m.name):""}</b><span>${m.at?new Date(m.at).toLocaleString("he-IL",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}):""}</span></div><p>${esc(m.text)}</p><button class="ghost" data-fbdel="${k}" style="padding:4px 10px;font-size:13px">מחיקה</button></div>`).join(""):'<p style="color:var(--ink-2)">אין פניות עדיין.</p>';
+        $("#fb-l").onclick=async e=>{ const b=e.target.closest("[data-fbdel]"); if(!b) return; if(!confirm("למחוק את הפנייה?")) return; try{ await fbDel(L[+b.dataset.fbdel]); draw(); }catch(err){ $("#fb-le").textContent=writeErr(err); } };
+      }catch(err){ $("#fb-l").textContent="לא הצלחנו לטעון את הפניות."; } };
+    draw(); };
+}
 async function migrate(){
   if(!KEY||!canWrite||migrating) return; migrating=true;
   try{
@@ -1505,6 +1553,7 @@ async function migrate(){
   if(!db){ setStatus("אין חיבור לשרת. בדקו את החיבור ורעננו."); canWrite=false; refresh(); return; }
   try{ const {data}=await SB.auth.getSession(); SESSION=data.session; }catch{}
   canWrite=!!SESSION; canEdit=canWrite;
+  fbInit();
   let v=null; try{ v=await db.doc("vault/meta").get(); }catch{}
   vault=v&&v.exists?v.data():null;
   updateLockBtn();
