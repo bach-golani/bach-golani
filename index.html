@@ -290,6 +290,9 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
 .split .hph .sl{position:absolute;inset:0;background-size:cover;opacity:0;transition:opacity 1.4s ease}
 .split .hph .sl.on{opacity:1;animation:kb 7s ease-out forwards}
 .split .hph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(35,48,31,.78) 0%,rgba(63,90,46,.25) 55%,rgba(63,90,46,.1) 100%)}
+.split .hph{clip-path:none}
+.split .hph::after{background:linear-gradient(to bottom,rgba(12,24,16,.6) 0%,rgba(12,24,16,.15) 38%,rgba(12,24,16,.1) 55%,rgba(20,32,22,.8) 100%)}
+.split .motto,.split .brand b{color:#fff!important;text-shadow:0 2px 14px rgba(0,0,0,.45)}
 .split .hph-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
 .split .hph-dots i{width:6px;height:6px;border-radius:9px;background:rgba(251,247,236,.5);transition:width .3s}
 .split .hph-dots i.on{width:18px;background:var(--paper)}
