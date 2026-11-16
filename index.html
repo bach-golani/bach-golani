@@ -705,7 +705,7 @@ SECTIONS.lessons={title:"תובנות ולקחים", img:"notebooks", cover:"l-b
   hints:{general:"תובנה אחת לכל פריט: מה קרה, מה למדנו, מה עושים אחרת"}};
 SECTIONS.learning={title:"לקחים ולמידה", img:"notebooks", cover:"l-brief.jpg|50% 50%", bg:"var(--sand)", cat:"disc", meta:"תחקירי ברוטו נטו ומבזקוני למידה", ic:"לל", hints:{}, subs:[["weekly","תחקירים שבועיים"],["flash","מבזקוני למידה"],["links","קישורים"]]};
 SECTIONS.phones={title:"אלפון טלפוני", img:"clipboard", cover:"l-staff.jpg|50% 55%", bg:"var(--leaf)", cat:"cmd", meta:"טלפונים של הסגל ובעלי תפקידים", ic:"☎", phones:true, subs:[["list","רשימה"],["tree","עץ מבנה"]]};
-const ORDER = ["reports","learning","phones","procedures","fitness","education","content","summaries","agendas"];
+const ORDER = ["reports","learning","phones","procedures","fitness","education","summaries","agendas"];
 let listUnit="51";
 
 let graphDoc=null, grRow=null, grView="rows";
@@ -788,7 +788,6 @@ function renderGrid(){
     <button class="tl2 photo full fit" data-go="fitness"><h3>אימון גופני</h3></button>
     <button class="tl2 dark" data-go="summaries"><small>${last?"אחרון: "+esc(last.title):"מה הוחלט ומי אחראי"}</small><h3>סיכומי<br>דיונים</h3></button>
     <button class="tl2 light" data-go="agendas"><small>${count("agendas")}</small><h3>פק״אות</h3></button>
-    <button class="tl2 light full row" data-go="content"><h3>תכנים משלימים</h3>${ARROW}</button>
     <button class="tl2 dark" data-go="learning"><small>תחקירים לפי שבועות</small><h3>לקחים<br>ולמידה</h3></button>
     <button class="tl2 sand" data-go="phones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><div><h3>אלפון<br>טלפוני</h3><small>${count("phones")}</small></div></button>`;
   renderToday();
@@ -1327,7 +1326,7 @@ function renderCmd(){
     const rs=items.filter(i=>i.section==="reports"&&i.sub!=="format"), now=new Date(), ks=[0,1,2].map(d=>{ const x=new Date(now.getFullYear(),now.getMonth()-d,1); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0"); });
     return `<div class="mon-sum">${ks.map((k,j)=>`<span class="${j?"":"cur"}"><b>${rs.filter(i=>monKey(i)===k).length}</b>${esc(HE_MON[+k.slice(5,7)-1])}</span>`).join("")}</div>`; })()}</div>`;
   // literature bars
-  const P=SECTIONS.procedures, rowsB=[...P.subs.map(([k,n])=>[n,by("procedures",k).length,"procedures"]),["לקחים ולמידה",by("learning").length,"learning"],["חינוך ומורשת",by("education").length,"education"],["תכנים משלימים",by("content").length,"content"]];
+  const P=SECTIONS.procedures, rowsB=[...P.subs.map(([k,n])=>[n,by("procedures",k).length,"procedures"]),["לקחים ולמידה",by("learning").length,"learning"],["חינוך ומורשת",by("education").length,"education"]];
   const mx=Math.max(1,...rowsB.map(r=>r[1]));
   h+=`<div class="card"><h2>מה יש באפליקציה</h2><div class="bars">${rowsB.map(([n,c,g])=>`<button class="bar" data-go="${g}"><span>${esc(n)}</span><i><em style="width:${Math.round(c/mx*100)}%"></em></i><b>${c}</b></button>`).join("")}</div></div>`;
   // discussions
