@@ -890,7 +890,7 @@ function renderList(){
   const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:s.subs?.[0][0];
   const list=all.filter(i=>(!s.subs||subOf(i)===listSub)&&(!s.units||i.unit===listUnit));
   if(s.phones){ list.sort((a,b)=>(a.unit||"").localeCompare(b.unit||"","he")||a.title.localeCompare(b.title,"he")); }
-  else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he"));
+  else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he",{numeric:true}));
   const hint=s.hints?.[listSub]||"הפריט הראשון מחכה לכם";
   if(list.length&&s.gallery===listSub){
     $("#l-list").innerHTML=`<div class="gal">${list.map(i=>{ const im=(i.files||[]).find(f=>f.type?.startsWith("image/")); if(im) FILES[im.id]=im;
