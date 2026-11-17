@@ -714,7 +714,7 @@ SECTIONS.lessons={title:"תובנות ולקחים", img:"notebooks", cover:"l-b
   subs:[["general","כללי"],["training","הכשרה ואימונים"],["command","פיקוד וניהול"],["safety","בטיחות"]],
   hints:{general:"תובנה אחת לכל פריט: מה קרה, מה למדנו, מה עושים אחרת"}};
 SECTIONS.learning={title:"לקחים ולמידה", img:"notebooks", cover:"l-brief.jpg|50% 50%", bg:"var(--sand)", cat:"disc", meta:"תחקירי ברוטו נטו ומבזקוני למידה", ic:"לל", hints:{}, subs:[["weekly","תחקירים שבועיים"],["flash","מבזקוני למידה"],["links","קישורים"]]};
-SECTIONS.phones={title:"אלפון טלפוני", img:"clipboard", cover:"l-staff.jpg|50% 55%", bg:"var(--leaf)", cat:"cmd", meta:"טלפונים של הסגל ובעלי תפקידים", ic:"☎", phones:true, subs:[["list","לפי אגפים"],["tree","עץ מבנה"]]};
+SECTIONS.phones={title:"אלפון טלפוני", img:"clipboard", cover:"l-staff.jpg|50% 55%", bg:"var(--leaf)", cat:"cmd", meta:"טלפונים של הסגל ובעלי תפקידים", ic:"☎", phones:true, subs:[["list","לפי אגפים"]]};
 const ORDER = ["reports","learning","phones","procedures","fitness","shooting","education","summaries","agendas"];
 let listUnit="51";
 
@@ -1179,8 +1179,8 @@ function editPhone(i,pre){
     <div class="field"><label for="p-role">תפקיד</label><input id="p-role" list="p-roles" placeholder="בחרו תפקיד מהרשימה" value="${esc(i?.role??pre?.role)}"><datalist id="p-roles">${DEPTS.flatMap(d=>d[1]).map(r=>`<option value="${esc(r)}">`).join("")}</datalist></div>
     <div class="field"><label for="p-unit">אגף</label><input id="p-unit" list="p-depts" placeholder="בחרו אגף" value="${esc(i?.unit??pre?.unit)}"><datalist id="p-depts">${DEPTS.map(d=>`<option value="${esc(d[0])}">`).join("")}</datalist></div>
     <div class="field"><label for="p-phone">טלפון</label><input id="p-phone" type="tel" dir="ltr" inputmode="tel" required value="${esc(i?.phone)}"></div>
-    <div class="field"><label for="p-boss">ממונה ישיר בעץ (שם, לא חובה)</label><input id="p-boss" list="p-names" value="${esc(i?.boss)}"><datalist id="p-names">${items.filter(x=>x.section==="phones").map(x=>`<option value="${esc(x.title)}">`).join("")}</datalist></div>
-    <div class="field"><label for="p-head">מיקום בעץ</label><select id="p-head"><option value="">רגיל</option><option value="1" ${i?.head==="1"?"selected":""}>ראש ענף</option><option value="root" ${i?.head==="root"?"selected":""}>בראש העץ</option></select></div>
+    <div class="field" hidden><label for="p-boss">ממונה ישיר בעץ (שם, לא חובה)</label><input id="p-boss" list="p-names" value="${esc(i?.boss)}"><datalist id="p-names">${items.filter(x=>x.section==="phones").map(x=>`<option value="${esc(x.title)}">`).join("")}</datalist></div>
+    <div class="field" hidden><label for="p-head">מיקום בעץ</label><select id="p-head"><option value="">רגיל</option><option value="1" ${i?.head==="1"?"selected":""}>ראש ענף</option><option value="root" ${i?.head==="root"?"selected":""}>בראש העץ</option></select></div>
     <div class="field"><label for="p-note">הערה (לא חובה)</label><input id="p-note" value="${esc(i?.body)}"></div>
     <div class="btns"><button class="add" type="submit">שמירה</button>${i?'<button class="danger" type="button" id="p-del">מחיקה</button>':""}<button class="ghost" type="button" id="p-cancel">ביטול</button></div>
     <div class="err" id="p-err"></div></form>`);
