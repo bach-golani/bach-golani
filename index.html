@@ -692,7 +692,9 @@ const SECTIONS = {
                subs:[["padlet","פאדלט חינוך"]],
                hints:{padlet:"הוסיפו את הקישור לפאדלט בשדה ״קישור חיצוני״"}},
   content:    {title:"תכנים משלימים",  img:"compass",   cover:"p-urban.jpg|center 62%", bg:"var(--lav)",   cat:"edu", meta:"חומרי לימוד והעשרה", ic:"תמ"},
-  summaries:  {title:"סיכומי דיונים",  img:"clipboard", cover:"l-hall.jpg|62% 70%", bg:"var(--blush)", cat:"disc",  meta:"מה הוחלט ומי אחראי", ic:"סד", dated:true},
+  summaries:  {title:"סיכומי דיונים",  img:"clipboard", cover:"l-hall.jpg|62% 70%", bg:"var(--blush)", cat:"disc",  meta:"מה הוחלט ומי אחראי", ic:"סד", dated:true,
+    subs:[["forum","פורום מוביל"],["misdarim","מסדרי מגד לגיוס"],["month","סיכום חודש"],["company","מיקוד בפלוגה"],["training","סיכומי הכשרה"]],
+    guess:i=>{const t=i.title||""; return /מסדר/.test(t)?"misdarim":/סיכום חודש|חודשי/.test(t)?"month":/מיקוד בפלוגה|פלוגה/.test(t)?"company":/הכשרה/.test(t)?"training":"forum";}},
   agendas:    {title:"פק״אות",  img:"deskbooks", cover:"l-cypress.jpg|50% 55%", bg:"var(--beige)", cat:"disc",  meta:"פקודות והוראות לקורסים ולשבועות", ic:"פק", dated:true},
 };
 SECTIONS.fitness={title:"אימון גופני", img:"target", cover:"l-krav.jpg|50% 45%", bg:"var(--sage)", cat:"cmd", meta:"הוראות א״ג, פק״לונים ועזרים, המפקד המאמן", ic:"א״ג",
@@ -891,7 +893,7 @@ function renderList(){
     return;
   }
   if(s.phones&&listSub==="tree"){ $("#l-list").innerHTML=phoneTree(all); return; }
-  const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:s.subs?.[0][0];
+  const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:(s.guess?s.guess(i):s.subs?.[0][0]);
   const list=all.filter(i=>(!s.subs||subOf(i)===listSub)&&(!s.units||i.unit===listUnit));
   if(s.phones){ list.sort((a,b)=>(a.unit||"").localeCompare(b.unit||"","he")||a.title.localeCompare(b.title,"he")); }
   else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he",{numeric:true}));
