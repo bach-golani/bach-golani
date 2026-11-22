@@ -692,7 +692,7 @@ const SECTIONS = {
   procedures: {title:"ספרות מקצועית",  img:"notebooks", cover:"p-radio.jpg|center 55%", bg:"var(--sage)",  cat:"cmd",   meta:"נהלים למ״פים והוראות בטיחות", ic:"ספ", wide:true,
                subs:[["procedures","נהלים למ״פים"],["safety","הוראות בטיחות"],["pakal","פק״לים"],["courses","השתלמויות"]]},
   education:  {title:"חינוך ומורשת",          img:"books",     cover:"l-memorial.jpg|50% 55%", bg:"var(--cream)", cat:"edu",   meta:"שיעורי חינוך ומורשת", ic:"חנ",
-               subs:[["padlet","פאדלט חינוך"]],
+               subs:[["padlet","פאדלט חינוך"],["roots","שורשים חומים"]],
                hints:{padlet:"הוסיפו את הקישור לפאדלט בשדה ״קישור חיצוני״"}},
   content:    {title:"תכנים משלימים",  img:"compass",   cover:"p-urban.jpg|center 62%", bg:"var(--lav)",   cat:"edu", meta:"חומרי לימוד והעשרה", ic:"תמ"},
   summaries:  {title:"סיכומי דיונים",  img:"clipboard", cover:"l-hall.jpg|62% 70%", bg:"var(--blush)", cat:"disc",  meta:"מה הוחלט ומי אחראי", ic:"סד", dated:true,
@@ -955,7 +955,7 @@ function openItem(id){
   const i=items.find(x=>x.id===id); if(!i) return;
   if(i.section==="phones"){ if(canWrite) editPhone(i); return; }
   if(isDocBody(i.body)){ openDocViewer(i); return; }
-  if(((i.section==="learning"&&i.sub==="flash")||i.section==="agendas"||i.section==="summaries"||i.section==="fitness"||i.section==="shooting")&&!i.body&&i.files?.length){ const f=i.files[0]; FILES[f.id]=f; openViewer(f).then(()=>{ if(canWrite){ $("#v-edit").hidden=false; $("#v-edit").onclick=()=>{ closeViewer(); editItem(i); }; } }); return; }
+  if(((i.section==="learning"&&i.sub==="flash")||i.section==="agendas"||i.section==="summaries"||i.section==="fitness"||i.section==="shooting"||(i.section==="education"&&i.sub==="roots"))&&!i.body&&i.files?.length){ const f=i.files[0]; FILES[f.id]=f; openViewer(f).then(()=>{ if(canWrite){ $("#v-edit").hidden=false; $("#v-edit").onclick=()=>{ closeViewer(); editItem(i); }; } }); return; }
   const s=SECTIONS[i.section]||{}, sub=s.subs?.find(x=>x[0]===i.sub)?.[1], unit=s.units?.find(x=>x[0]===i.unit)?.[1];
   openSheet(`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span class="tag">${esc(s.title||"")}</span>${sub?`<span class="tag">${esc(sub)}</span>`:""}${unit?`<span class="tag">${esc(unit)}</span>`:""}${i.date?`<span class="tag" style="background:var(--stone);color:var(--ink-2)">${fmtDate(i.date)}</span>`:""}</div>
     <h2>${esc(i.title)}</h2>
