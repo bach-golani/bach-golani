@@ -696,8 +696,8 @@ const SECTIONS = {
                hints:{padlet:"הוסיפו את הקישור לפאדלט בשדה ״קישור חיצוני״"}},
   content:    {title:"תכנים משלימים",  img:"compass",   cover:"p-urban.jpg|center 62%", bg:"var(--lav)",   cat:"edu", meta:"חומרי לימוד והעשרה", ic:"תמ"},
   summaries:  {title:"סיכומי דיונים",  img:"clipboard", cover:"l-hall.jpg|62% 70%", bg:"var(--blush)", cat:"disc",  meta:"מה הוחלט ומי אחראי", ic:"סד", dated:true,
-    subs:[["forum","פורום מוביל"],["misdarim","מסדרי מגד לגיוס"],["month","סיכום חודש"],["company","מיקוד בפלוגה"],["training","סיכומי הכשרה"]],
-    guess:i=>{const t=i.title||""; return /מסדר/.test(t)?"misdarim":/סיכום חודש|חודשי/.test(t)?"month":/מיקוד בפלוגה|פלוגה/.test(t)?"company":/הכשרה/.test(t)?"training":"forum";}},
+    subs:[["forum","פורום מוביל"],["misdarim","מסדרי מגד לגיוס"],["month","סיכום חודש"],["company","מיקוד בפלוגה"],["training","סיכומי הכשרה"],["tahzan","תחקיר תחצ״ן"]],
+    guess:i=>{const t=i.title||""; return /תחצ/.test(t)?"tahzan":/מסדר/.test(t)?"misdarim":/סיכום חודש|חודשי/.test(t)?"month":/מיקוד בפלוגה|פלוגה/.test(t)?"company":/הכשרה/.test(t)?"training":"forum";}},
   agendas:    {title:"פק״אות",  img:"deskbooks", cover:"l-cypress.jpg|50% 55%", bg:"var(--beige)", cat:"disc",  meta:"פקודות והוראות לקורסים ולשבועות", ic:"פק", dated:true,
     subs:[["courses","קורסים"],["pre","טרום"]], guess:i=>/טרום/.test(i.title||"")?"pre":"courses"},
 };
