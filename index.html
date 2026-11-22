@@ -351,7 +351,7 @@ body.locked .wrap,body.locked .nav{visibility:hidden}
 .tl2.dark{background:var(--ink);color:var(--paper)} .tl2.dark small{color:var(--gold)}
 .tl2.light{background:var(--sand);color:var(--ink)}
 .tl2.row{min-height:84px;flex-direction:row;align-items:center}
-.tl2.photo{min-height:160px;padding:0;justify-content:flex-end;align-items:flex-start;overflow:hidden;background:linear-gradient(135deg,#3f5a2e,#23301f)}
+.tl2.photo{min-height:160px;padding:0;justify-content:flex-end;align-items:flex-start;overflow:hidden;background:#2b3a2f url(img/l-memorial.jpg) 50% 55%/cover}
 .tl2.photo h3{background:var(--paper);color:var(--ink);padding:8px 16px;margin:0 0 14px}
 .tl2.photo small{display:none}
 .split .lockbtn{background:var(--ink);color:var(--sand)}
@@ -691,7 +691,7 @@ async function importBackup(file,progress){
 const SECTIONS = {
   procedures: {title:"ספרות מקצועית",  img:"notebooks", cover:"p-radio.jpg|center 55%", bg:"var(--sage)",  cat:"cmd",   meta:"נהלים למ״פים והוראות בטיחות", ic:"ספ", wide:true,
                subs:[["procedures","נהלים למ״פים"],["safety","הוראות בטיחות"],["pakal","פק״לים"],["courses","השתלמויות"]]},
-  education:  {title:"חינוך ומורשת",          img:"books",     cover:"none", bg:"var(--cream)", cat:"edu",   meta:"שיעורי חינוך ומורשת", ic:"חנ",
+  education:  {title:"חינוך ומורשת",          img:"books",     cover:"l-memorial.jpg|50% 55%", bg:"var(--cream)", cat:"edu",   meta:"שיעורי חינוך ומורשת", ic:"חנ",
                subs:[["padlet","פאדלט חינוך"]],
                hints:{padlet:"הוסיפו את הקישור לפאדלט בשדה ״קישור חיצוני״"}},
   content:    {title:"תכנים משלימים",  img:"compass",   cover:"p-urban.jpg|center 62%", bg:"var(--lav)",   cat:"edu", meta:"חומרי לימוד והעשרה", ic:"תמ"},
