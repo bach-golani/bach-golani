@@ -1528,7 +1528,7 @@ function updateLockBtn(){
 }
 function adminBlock(){
   return SESSION?`<div class="btns" style="flex-direction:column;margin-top:14px;border-top:1px solid var(--line,#ddd);padding-top:14px"><small style="color:var(--ink-2)">מחובר כמנהל: ${esc(SESSION.user?.email||"")}</small>
-    <button class="ghost" id="adm-imp">ייבוא קובץ גיבוי / עדכון</button><input type="file" id="adm-file" accept=".json,application/json" hidden>
+    <button class="ghost" id="adm-imp">ייבוא קובץ גיבוי / עדכון</button><input type="file" id="adm-file" accept=".json,application/json" multiple hidden>
     <button class="ghost" id="adm-out">יציאה ממצב מנהל</button></div>`
   :`<form id="adm-f" style="margin-top:14px;border-top:1px solid var(--line,#ddd);padding-top:14px"><b>כניסת מנהל</b>
     <div class="field"><label for="adm-e">אימייל</label><input id="adm-e" type="email" autocomplete="username" required></div>
@@ -1540,9 +1540,10 @@ function adminWire(){
     try{ await adminSignIn($("#adm-e").value.trim(),$("#adm-p").value); location.reload(); }catch(err){ $("#sec-e").textContent="הכניסה נכשלה. בדקו אימייל וסיסמה."; } };
   const o=$("#adm-out"); if(o) o.onclick=async()=>{ await adminSignOut(); location.reload(); };
   const im=$("#adm-imp"); if(im){ im.onclick=()=>$("#adm-file").click();
-    $("#adm-file").onchange=async e=>{ const file=e.target.files[0]; if(!file) return;
-      if(!confirm("לייבא את \""+file.name+"\"? תוכן עם אותו מזהה יוחלף.")) return;
-      try{ const r=await importBackup(file,t=>{ $("#sec-e").textContent=t; }); $("#sec-e").textContent=`יובאו ${r.docs} פריטים ו-${r.files} קבצים. מרענן…`; setTimeout(()=>location.reload(),1500); }
+    $("#adm-file").onchange=async e=>{ const fl=[...e.target.files].sort((x,y)=>x.name.localeCompare(y.name,undefined,{numeric:true})); if(!fl.length) return;
+      if(!confirm(`לייבא ${fl.length} קבצים? תוכן עם אותו מזהה יוחלף.`)) return;
+      try{ let D=0,F=0; for(let k=0;k<fl.length;k++){ const r=await importBackup(fl[k],t=>{ $("#sec-e").textContent=`קובץ ${k+1}/${fl.length}: `+t; }); D+=r.docs; F+=r.files; }
+        $("#sec-e").textContent=`יובאו ${D} פריטים ו-${F} קבצים. מרענן…`; setTimeout(()=>location.reload(),1500); }
       catch(err){ $("#sec-e").textContent="הייבוא נכשל: "+(err.message||err); } }; }
 }
 $("#lockbtn").onclick=()=>{
