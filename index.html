@@ -1598,10 +1598,13 @@ function startData(){
   db.collection("gantt").onSnapshot(async s=>{
     const list=await decodeDocs(s.docs);
     const NO_OPER=r=>!/כוננ|אופרטיבי/.test(r.name||"");
-    let g0=list.find(w=>!w._bad&&w.kind==="graph")||null;
+    if(!window._repoGantt) window._repoGantt=fetch("data/gantt.json",{cache:"no-store"}).then(r=>r.ok?r.json():{}).catch(()=>({}));
+    const repo=await window._repoGantt;
+    for(const [id,w] of Object.entries(repo||{})){ const i=list.findIndex(x=>x&&x.id===id); const doc={id,...w}; if(i>=0) list[i]=doc; else list.push(doc); }
+    let g0=list.find(w=>w&&!w._bad&&w.kind==="graph")||{kind:"graph",src:"data/graph.json",v:Date.now()};
     if(g0&&g0.src){ try{ const r=await fetch(g0.src+"?v="+(g0.v||1)); if(r.ok) g0=await r.json(); else g0=null; }catch{ g0=null; } }
     graphDoc=g0?{...g0,groups:(g0.groups||[]).map(g=>({...g,rows:(g.rows||[]).filter(NO_OPER)})).filter(g=>g.rows.length)}:null;
-    weeks=list.filter(w=>!w._bad&&w.days&&w.rows).map(w=>({...w,rows:w.rows.filter(NO_OPER)})); if(current==="home") renderToday();
+    weeks=list.filter(w=>w&&!w._bad&&w.days&&w.rows).map(w=>({...w,rows:w.rows.filter(NO_OPER)})); if(current==="home") renderToday();
     if(!s.metadata.fromCache) migrate();
     if(current==="gantt") renderGantt(); if(current==="cmd") renderCmd();
   },()=>{});
