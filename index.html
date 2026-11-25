@@ -712,7 +712,8 @@ SECTIONS.reports={title:"דיווחים ראשונים", img:"clipboard", cover:
 SECTIONS.lessons={title:"תובנות ולקחים", img:"notebooks", cover:"l-brief.jpg|35% 62%", bg:"var(--sand)", cat:"disc", meta:"ממחזורים קודמים", ic:"לק", dated:true,
   subs:[["general","כללי"],["training","הכשרה ואימונים"],["command","פיקוד וניהול"],["safety","בטיחות"]],
   hints:{general:"תובנה אחת לכל פריט: מה קרה, מה למדנו, מה עושים אחרת"}};
-SECTIONS.learning={title:"לקחים ולמידה", img:"notebooks", cover:"l-brief.jpg|50% 50%", bg:"var(--sand)", cat:"disc", meta:"תחקירי ברוטו נטו ומבזקוני למידה", ic:"לל", hints:{}, subs:[["weekly","תחקירים שבועיים"],["flash","מבזקוני למידה"],["links","קישורים"]]};
+SECTIONS.learning={title:"לקחים ולמידה", img:"notebooks", cover:"l-brief.jpg|50% 50%", bg:"var(--sand)", cat:"disc", meta:"תחקירי ברוטו נטו ומבזקוני למידה", ic:"לל", hints:{}, subs:[["weekly","תחקירים שבועיים"],["flash","מבזקוני למידה"],["binders","אוגדני לקחים"],["links","קישורים"]]};
+SECTIONS.learning.hints.binders="העלו את האוגדן כקובץ PDF – הוא ייפתח ישירות לקריאה";
 SECTIONS.phones={title:"אלפון טלפוני", img:"clipboard", cover:"l-staff.jpg|50% 55%", bg:"var(--leaf)", cat:"cmd", meta:"טלפונים של הסגל ובעלי תפקידים", ic:"☎", phones:true, subs:[["list","לפי אגפים"]]};
 const ORDER = ["reports","learning","phones","procedures","fitness","shooting","education","summaries","agendas"];
 let listUnit="51";
@@ -823,13 +824,14 @@ function renderToday(){
 
 /* routing */
 function show(view){
-  current=view||"home";
+  const [vSec,vSub]=(view||"").split("/");
+  current=vSec||"home";
   if(current!=="home"&&current!=="gantt"&&current!=="cmd"&&!SECTIONS[current]) current="home";
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
   if(current==="home"){ $("#s-home").classList.add("on"); renderGrid(); }
   else if(current==="gantt"){ $("#s-gantt").classList.add("on"); renderGantt(); }
   else if(current==="cmd"){ $("#s-cmd").classList.add("on"); renderCmd(); }
-  else { $("#s-list").classList.add("on"); listSub=SECTIONS[current].subs?.[0][0]||null; renderList(); }
+  else { $("#s-list").classList.add("on"); listSub=(vSub&&SECTIONS[current].subs?.some(x=>x[0]===vSub))?vSub:(SECTIONS[current].subs?.[0][0]||null); renderList(); }
   document.querySelectorAll(".nav button").forEach(b=>b.toggleAttribute("aria-current",b.dataset.go===current));
   document.querySelectorAll(".nav button[aria-current]").forEach(b=>b.setAttribute("aria-current","page"));
   window.scrollTo(0,0);
@@ -954,7 +956,7 @@ function openItem(id){
   const i=items.find(x=>x.id===id); if(!i) return;
   if(i.section==="phones"){ if(canWrite) editPhone(i); return; }
   if(isDocBody(i.body)){ openDocViewer(i); return; }
-  if(((i.section==="learning"&&i.sub==="flash")||i.section==="agendas"||i.section==="summaries"||i.section==="fitness"||i.section==="shooting"||(i.section==="education"&&i.sub==="roots"))&&!i.body&&i.files?.length){ const f=i.files[0]; FILES[f.id]=f; openViewer(f).then(()=>{ if(canWrite){ $("#v-edit").hidden=false; $("#v-edit").onclick=()=>{ closeViewer(); editItem(i); }; } }); return; }
+  if(((i.section==="learning"&&(i.sub==="flash"||i.sub==="binders"))||i.section==="agendas"||i.section==="summaries"||i.section==="fitness"||i.section==="shooting"||(i.section==="education"&&i.sub==="roots"))&&!i.body&&i.files?.length){ const f=i.files[0]; FILES[f.id]=f; openViewer(f).then(()=>{ if(canWrite){ $("#v-edit").hidden=false; $("#v-edit").onclick=()=>{ closeViewer(); editItem(i); }; } }); return; }
   const s=SECTIONS[i.section]||{}, sub=s.subs?.find(x=>x[0]===i.sub)?.[1], unit=s.units?.find(x=>x[0]===i.unit)?.[1];
   openSheet(`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span class="tag">${esc(s.title||"")}</span>${sub?`<span class="tag">${esc(sub)}</span>`:""}${unit?`<span class="tag">${esc(unit)}</span>`:""}${i.date?`<span class="tag" style="background:var(--stone);color:var(--ink-2)">${fmtDate(i.date)}</span>`:""}</div>
     <h2>${esc(i.title)}</h2>
