@@ -715,6 +715,7 @@ SECTIONS.lessons={title:"תובנות ולקחים", img:"notebooks", cover:"l-b
 SECTIONS.learning={title:"לקחים ולמידה", img:"notebooks", cover:"l-brief.jpg|50% 50%", bg:"var(--sand)", cat:"disc", meta:"תחקירי ברוטו נטו ומבזקוני למידה", ic:"לל", hints:{}, subs:[["weekly","תחקירים שבועיים"],["flash","מבזקוני למידה"],["binders","אוגדני לקחים"],["links","קישורים"]]};
 SECTIONS.learning.hints.binders="העלו את האוגדן כקובץ PDF – הוא ייפתח ישירות לקריאה";
 SECTIONS.phones={title:"אלפון טלפוני", img:"clipboard", cover:"l-staff.jpg|50% 55%", bg:"var(--leaf)", cat:"cmd", meta:"טלפונים של הסגל ובעלי תפקידים", ic:"☎", phones:true, subs:[["list","לפי אגפים"]]};
+const BINDERS=[{id:"sikumim",title:"אוגדן לקחים – מסיכומי הכשרה, סיכום אמצע הכשרה וסיכום המסכם",date:"2026-11-25"},{id:"mikudim",title:"אוגדן לקחי למידה ממיקודים",date:"2026-11-13"}];
 const ORDER = ["reports","learning","phones","procedures","fitness","shooting","education","summaries","agendas"];
 let listUnit="51";
 
@@ -921,7 +922,7 @@ function renderList(){
   if(s.phones&&listSub==="list"){ $("#l-list").innerHTML=phoneDepts(all); return; }
   const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:(s.guess?s.guess(i):s.subs?.[0][0]);
   const list=all.filter(i=>(!s.subs||subOf(i)===listSub)&&(!s.units||i.unit===listUnit));
-  if(current==="learning"&&listSub==="binders"){ if(!window._binders){ window._binders=[]; fetch("data/binders.json",{cache:"no-store"}).then(r=>r.ok?r.json():[]).then(b=>{ window._binders=b||[]; if(current==="learning"&&listSub==="binders") renderList(); }).catch(()=>{}); } for(const b of window._binders) list.push({id:"bnd:"+b.id,section:"learning",sub:"binders",title:b.title,date:b.date}); }
+  if(current==="learning"&&listSub==="binders"){ for(const b of BINDERS) list.push({id:"bnd:"+b.id,section:"learning",sub:"binders",title:b.title,date:b.date}); }
   if(s.phones){ list.sort((a,b)=>(a.unit||"").localeCompare(b.unit||"","he")||a.title.localeCompare(b.title,"he")); }
   else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he",{numeric:true}));
   const hint=s.hints?.[listSub]||"הפריט הראשון מחכה לכם";
