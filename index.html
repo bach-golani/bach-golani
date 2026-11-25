@@ -922,7 +922,8 @@ function renderList(){
   if(s.phones&&listSub==="list"){ $("#l-list").innerHTML=phoneDepts(all); return; }
   const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:(s.guess?s.guess(i):s.subs?.[0][0]);
   const list=all.filter(i=>(!s.subs||subOf(i)===listSub)&&(!s.units||i.unit===listUnit));
-  if(current==="learning"&&listSub==="binders"){ for(const b of BINDERS) list.push({id:"bnd:"+b.id,section:"learning",sub:"binders",title:b.title,date:b.date}); }
+  if(current==="learning"&&listSub==="binders") for(let k=list.length-1;k>=0;k--) if(!list[k].files?.length) list.splice(k,1);
+  if(current==="learning"&&listSub==="binders"){ for(const b of BINDERS) list.push({id:"bnd:"+b.id,section:"learning",sub:"binders",title:b.title,date:b.date,files:[{name:b.id+".pdf"}]}); }
   if(s.phones){ list.sort((a,b)=>(a.unit||"").localeCompare(b.unit||"","he")||a.title.localeCompare(b.title,"he")); }
   else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he",{numeric:true}));
   const hint=s.hints?.[listSub]||"הפריט הראשון מחכה לכם";
