@@ -921,6 +921,7 @@ function renderList(){
   if(s.phones&&listSub==="list"){ $("#l-list").innerHTML=phoneDepts(all); return; }
   const subOf=i=>s.subs?.some(x=>x[0]===i.sub)?i.sub:(s.guess?s.guess(i):s.subs?.[0][0]);
   const list=all.filter(i=>(!s.subs||subOf(i)===listSub)&&(!s.units||i.unit===listUnit));
+  if(current==="learning"&&listSub==="binders"){ if(!window._binders){ window._binders=[]; fetch("data/binders.json",{cache:"no-store"}).then(r=>r.ok?r.json():[]).then(b=>{ window._binders=b||[]; if(current==="learning"&&listSub==="binders") renderList(); }).catch(()=>{}); } for(const b of window._binders) list.push({id:"bnd:"+b.id,section:"learning",sub:"binders",title:b.title,date:b.date}); }
   if(s.phones){ list.sort((a,b)=>(a.unit||"").localeCompare(b.unit||"","he")||a.title.localeCompare(b.title,"he")); }
   else list.sort(s.dated?(a,b)=>(b.date||"").localeCompare(a.date||""):(a,b)=>a.title.localeCompare(b.title,"he",{numeric:true}));
   const hint=s.hints?.[listSub]||"הפריט הראשון מחכה לכם";
@@ -953,6 +954,7 @@ $("#v-in").onclick=()=>{ if(window._docMode){ docZoom=Math.min(1.8,docZoom+0.15)
 $("#v-out").onclick=()=>{ if(window._docMode){ docZoom=Math.max(0.7,docZoom-0.15); const d=$(".docp"); if(d) d.style.fontSize=(15*docZoom)+"px"; return; } if(vDoc&&vZoom>0.6){ vZoom=Math.max(0.6,vZoom/1.4); renderPdf(vToken); } };
 
 function openItem(id){
+  if(id.startsWith("bnd:")){ location.href="binder.html#"+encodeURIComponent(id.slice(4)); return; }
   const i=items.find(x=>x.id===id); if(!i) return;
   if(i.section==="phones"){ if(canWrite) editPhone(i); return; }
   if(isDocBody(i.body)){ openDocViewer(i); return; }
